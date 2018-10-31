@@ -31,6 +31,10 @@ Or from the CLI
 bin/kaocha --plugin kaocha.plugin/junit-xml --junit-xml-file junit.xml
 ```
 
+## Requirements
+
+Requires at least Kaocha 0.0-239 and Clojure 1.9.
+
 ## CircleCI
 
 One of the services that can use this output is CircleCI. Your
@@ -44,7 +48,7 @@ jobs:
       - image: circleci/clojure:tools-deps-1.9.0.394
     steps:
       - checkout
-      - run: mkdir -p ~/test-results/kaocha
+      - run: mkdir -p test-results/kaocha
       - run: bin/kaocha --plugin kaocha.plugin/junit-xml --junit-xml-file test-results/kaocha/results.xml
       - store_test_results:
           path: test-results
