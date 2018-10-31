@@ -47,7 +47,7 @@ jobs:
       - run: mkdir -p ~/test-results/kaocha
       - run: bin/kaocha --plugin kaocha.plugin/junit-xml --junit-xml-file test-results/kaocha/results.xml
       - store_test_results:
-        path: test-results
+          path: test-results
 ```
 
 ## Resources
