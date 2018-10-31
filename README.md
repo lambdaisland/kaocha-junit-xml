@@ -31,6 +31,25 @@ Or from the CLI
 bin/kaocha --plugin kaocha.plugin/junit-xml --junit-xml-file junit.xml
 ```
 
+## CircleCI
+
+One of the services that can use this output is CircleCI. Your
+`.circleci/config.yml` could look like this:
+
+``` yml
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/clojure:tools-deps-1.9.0.394
+    steps:
+      - checkout
+      - run: mkdir -p ~/test-results/kaocha
+      - run: bin/kaocha --plugin kaocha.plugin/junit-xml --junit-xml-file test-results/kaocha/results.xml
+      - store_test_results:
+        path: test-results
+```
+
 ## Resources
 
 It was hard to find a definitive source of the Ant Junit XML format. I mostly
