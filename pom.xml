@@ -2,11 +2,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>lambdaisland</groupId>
-  <artifactId>kaocha</artifactId>
+  <artifactId>kaocha-junit-xml</artifactId>
   <version>0.0-7</version>
   <name>kaocha</name>
-  <description>Full featured next generation test runner for Clojure.</description>
-  <url>https://github.com/lambdaisland/kaocha</url>
+  <description>Junit xml output for kaocha</description>
+  <url>https://github.com/lambdaisland/kaocha-junit-xml</url>
   <inceptionYear>2018</inceptionYear>
   <organization>
     <name>Lambda Island</name>
@@ -19,9 +19,9 @@
     </license>
   </licenses>
   <scm>
-    <url>https://github.com/lambdaisland/kaocha</url>
-    <connection>scm:git:git://github.com/lambdaisland/kaocha.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com/lambdaisland/kaocha.git</developerConnection>
+    <url>https://github.com/lambdaisland/kaocha-junit-xml</url>
+    <connection>scm:git:git://github.com/lambdaisland/kaocha-junit-xml.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/lambdaisland/kaocha-junit-xml.git</developerConnection>
     <tag>ad797fee4dc1d205fbfb07b7e574984906181c9b</tag>
   </scm>
   <dependencies>
