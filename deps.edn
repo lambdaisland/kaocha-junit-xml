@@ -1,0 +1,11 @@
+{:paths ["src"]
+ :deps  {org.clojure/clojure  {:mvn/version "1.10.0-beta4"}
+         lambdaisland/kaocha  {:mvn/version "0.0-217"}
+         org.clojure/data.xml {:mvn/version "0.0.8"}}
+
+ :aliases
+ {:dev
+  {}
+
+  :test
+  {:extra-deps {}}}}
