@@ -1,2 +1,5 @@
 #kaocha/v1
-{}
+{;; This test suite is a bit strange as it invokes Kaocha within kaocha. For
+ ;; some reason the color flag for the inner config isn't honored, working
+ ;; around it by disabling color for the outer test as well.
+ :color? false}

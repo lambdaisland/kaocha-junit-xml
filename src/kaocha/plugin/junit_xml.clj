@@ -7,7 +7,8 @@
             [clojure.xml :as xml]
             [clojure.java.io :as io]
             [kaocha.report :as report]
-            [kaocha.hierarchy :as hierarchy]))
+            [kaocha.hierarchy :as hierarchy]
+            [kaocha.output :as output]))
 
 (defn inst->iso8601 [inst]
   (.. java.time.format.DateTimeFormatter/ISO_LOCAL_DATE_TIME
