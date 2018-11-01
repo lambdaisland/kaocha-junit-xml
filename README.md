@@ -13,7 +13,16 @@
 {:aliases
  {:test
   {:extra-deps {lambdaisland/kaocha {...}
-                lambdaisland/kaocha-junit-xml {...}}}}}
+                lambdaisland/kaocha-junit-xml {:mvn/version "0.0-10"}}}}}
+```
+
+or
+
+``` clojure
+;; project.clj
+(defproject ,,,
+  :dependencies [,,,
+                 [lambdaisland/kaocha-junit-xml "0.0-10"]])
 ```
 
 - Enable the plugin and set an output file

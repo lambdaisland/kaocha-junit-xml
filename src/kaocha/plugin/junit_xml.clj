@@ -108,9 +108,9 @@
     (conj opts [nil "--junit-xml-file FILENAME" "Save the test results to a Ant JUnit XML file."]))
 
   (config [config]
-    (assoc config
-           ::target-file
-           (get-in config [:kaocha/cli-options :junit-xml-file])))
+    (if-let [target (get-in config [:kaocha/cli-options :junit-xml-file])]
+      (assoc config ::target-file target)
+      config))
 
   (post-run [result]
     (when-let [filename (::target-file result)]
