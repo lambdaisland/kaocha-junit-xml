@@ -63,11 +63,13 @@
      :content (keep identity
                     [(cond
                        skip        {:tag :skipped}
-                       (> error 0) {:tag   :error
-                                    :attrs {:message (->> events
-                                                          (filter (comp #{:error} :type))
-                                                          failure-message)
-                                            :type    (error-type (::testable/events test))}}
+                       (> error 0) (let [events (filter (comp #{:error} :type) events)
+                                         message (some-> events first :actual (.getMessage))
+                                         trace (failure-message events)]
+                                     {:tag   :error
+                                      :attrs {:message message
+                                              :type    (error-type (::testable/events test))}
+                                      :content [trace]})
                        (> fail 0)  {:tag   :failure
                                     :attrs {:message (->> events
                                                           (filter #(and (hierarchy/fail-type? %)

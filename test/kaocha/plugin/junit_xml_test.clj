@@ -17,11 +17,13 @@
                [:testsuite {:name "unit" :id 0 :hostname "localhost" :skipped 1 :errors 2 :failures 1 :tests 4}
                 [:testcase {:name "demo.test/basic-test" :classname "demo.test" :assertions 1}]
                 [:testcase {:name "demo.test/exception-in-is-test" :classname "demo.test" :assertions 1}
-                 [:error {:message #(str/starts-with? % "expected: (throw (Exception. \"Inside assertion\"))\n  actual: #error")
-                          :type "java.lang.Exception"}]]
+                 [:error {:message "Inside assertion"
+                          :type "java.lang.Exception"}
+                  #(str/starts-with? % "expected: (throw (Exception.")]]
                 [:testcase {:name "demo.test/exception-outside-is-test" :classname "demo.test" :assertions 1}
-                 [:error {:message #(str/starts-with? % "expected: nil\n  actual: #error")
-                          :type "java.lang.Exception"}]]
+                 [:error {:message "outside assertion"
+                          :type "java.lang.Exception"}
+                  #(str/starts-with? % "expected: nil\n  actual: #error")]]
                 [:testcase {:name "demo.test/output-test" :classname "demo.test" :assertions 1}
                  [:failure {:message
                             "Expected:\n  {:foo 1}\nActual:\n  {:foo -1 +2}\n"
