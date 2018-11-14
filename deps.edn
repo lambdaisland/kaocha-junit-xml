@@ -1,6 +1,6 @@
 {:paths ["src"]
  :deps  {org.clojure/clojure  {:mvn/version "1.10.0-beta4"}
-         lambdaisland/kaocha  {:mvn/version "0.0-243"}
+         lambdaisland/kaocha  {:mvn/version "0.0-266"}
          org.clojure/data.xml {:mvn/version "0.0.8"}}
 
  :aliases
@@ -8,4 +8,9 @@
   {}
 
   :test
-  {:extra-deps {nubank/matcher-combinators {:mvn/version "0.4.2"}}}}}
+  {:extra-deps {nubank/matcher-combinators {:mvn/version "0.4.2"}}}
+
+  :clojure-1.9
+  {:extra-deps
+   ^:depot/ignore
+   {org.clojure/clojure {:mvn/version "1.9.0"}}}}}
