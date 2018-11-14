@@ -10,6 +10,9 @@
   :test
   {:extra-deps {nubank/matcher-combinators {:mvn/version "0.4.2"}}}
 
+  :junit-xml
+  {}
+
   :clojure-1.9
   {:extra-deps
    ^:depot/ignore
