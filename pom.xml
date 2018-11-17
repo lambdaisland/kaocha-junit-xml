@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>lambdaisland</groupId>
   <artifactId>kaocha-junit-xml</artifactId>
-  <version>0.0-18</version>
+  <version>0.0-27</version>
   <name>kaocha</name>
   <description>Junit xml output for kaocha</description>
   <url>https://github.com/lambdaisland/kaocha-junit-xml</url>
@@ -22,7 +22,7 @@
     <url>https://github.com/lambdaisland/kaocha-junit-xml</url>
     <connection>scm:git:git://github.com/lambdaisland/kaocha-junit-xml.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/lambdaisland/kaocha-junit-xml.git</developerConnection>
-    <tag>f971f8e8bb85c44bdc06099fba580fefe277df52</tag>
+    <tag>96f50cf44a3fe291ef8ce12889ab6abe065f6eed</tag>
   </scm>
   <dependencies>
     <dependency>
@@ -51,7 +51,7 @@
         <configuration>
           <archive>
             <manifestEntries>
-              <Git-Revision>f971f8e8bb85c44bdc06099fba580fefe277df52</Git-Revision>
+              <Git-Revision>96f50cf44a3fe291ef8ce12889ab6abe065f6eed</Git-Revision>
             </manifestEntries>
           </archive>
         </configuration>
