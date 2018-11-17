@@ -9,6 +9,8 @@
   (:import [java.nio.file Files]
            [java.nio.file.attribute FileAttribute]))
 
+(java.util.TimeZone/setDefault (java.util.TimeZone/getTimeZone "UTC"))
+
 (defn xml->hiccup [xml]
   (if (map? xml)
     (let [{:keys [tag attrs content]} xml]
@@ -49,7 +51,7 @@
     (is (= [:testuites {:skipped 0, :errors 0, :failures 0, :tests 1}
             [:testsuite {:name "my-test-type" :id 0 :hostname "localhost"
                          :skipped 0 :errors 0 :failures 0 :tests 0
-                         :timestamp "2007-12-03T11:15:30" :time "0.000012"}]]
+                         :timestamp "2007-12-03T10:15:30" :time "0.000012"}]]
            (-> {:kaocha.result/tests [{:kaocha.testable/id :my-test-type
                                        :kaocha.testable/type ::foo
                                        :kaocha.result/count 1
@@ -102,6 +104,6 @@
                            :hostname "localhost"
                            :skipped "0"
                            :id "0"
-                           :timestamp "2007-12-03T11:15:30"
+                           :timestamp "2007-12-03T10:15:30"
                            :failures "0"}]]
              (xml->hiccup (clojure.xml/parse (str outfile))))))))
