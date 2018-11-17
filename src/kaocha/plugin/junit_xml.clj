@@ -4,7 +4,7 @@
             [kaocha.testable :as testable]
             [kaocha.history :as history]
             [kaocha.result :as result]
-            [clojure.xml :as xml]
+            [kaocha.plugin.junit-xml.xml :as xml]
             [clojure.java.io :as io]
             [kaocha.report :as report]
             [kaocha.hierarchy :as hierarchy]
@@ -118,30 +118,3 @@
     (when-let [filename (::target-file result)]
       (write-junit-xml filename result))
     result))
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(comment
-  (require 'kaocha.repl)
-  (require 'kaocha.api)
-
-  (def result
-    (-> (kaocha.repl/config)
-
-        (kaocha.api/run)))
-
-
-  (xml/emit (result->xml result)
-
-            )
-
-  (def testable (first (filter (comp #{:kaocha.result-test/totals-test} ::testable/id) (test-seq result))))
-
-  (let [events (::testable/events testable)]
-    (filter events))
-
-  (mapcat ::result/tests
-          (::result/tests result))
-
-  (count (leaf-tests (first (::result/tests result)))))
