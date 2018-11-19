@@ -1,6 +1,8 @@
 # lambdaisland/kaocha-junit-xml
 
+<!-- badges -->
 [![CircleCI](https://circleci.com/gh/lambdaisland/kaocha-junit-xml.svg?style=svg)](https://circleci.com/gh/lambdaisland/kaocha-junit-xml) [![cljdoc badge](https://cljdoc.org/badge/lambdaisland/kaocha-junit-xml)](https://cljdoc.org/d/lambdaisland/kaocha-junit-xml) [![Clojars Project](https://img.shields.io/clojars/v/lambdaisland/kaocha-junit-xml.svg)](https://clojars.org/lambdaisland/kaocha-junit-xml) [![codecov](https://codecov.io/gh/lambdaisland/kaocha-junit-xml/branch/master/graph/badge.svg)](https://codecov.io/gh/lambdaisland/kaocha-junit-xml)
+<!-- /badges -->
 
 [Kaocha](https://github.com/lambdaisland/kaocha) plugin to generate a JUnit XML version of the test results.
 
@@ -71,8 +73,10 @@ went with [this page](http://llg.cubic.org/docs/junit/) for documentation.
 For information on how to configure CircleCI to use this information, see
 [store_test_results](https://circleci.com/docs/2.0/configuration-reference/#store_test_results).
 
+<!-- license-epl -->
 ## License
 
 Copyright &copy; 2018 Arne Brasseur
 
 Available under the terms of the Eclipse Public License 1.0, see LICENSE.txt
+<!-- /license-epl -->
