@@ -2,6 +2,7 @@
   (:require [clojure.test :refer :all]
             [clojure.xml :as cxml]
             [kaocha.plugin.junit-xml.xml :as xml]
+            [matcher-combinators.matchers :as m]
             [clojure.java.io :as io]))
 
 (deftest emit-test
@@ -16,10 +17,11 @@
                           :attrs {:hello "'twas brillig & the \"slithy\" toves"}})))))
 
 (deftest validate-test
-  (is (= (xml/validate "<foo></foo>" (io/resource "kaocha/junit_xml/JUnit.xsd"))
-         {:valid? false,
-          :line-number 1,
-          :column-number 6,
-          :public-id nil,
-          :system-id nil,
-          :message "cvc-elt.1: Cannot find the declaration of element 'foo'."})))
+  (is (match? {:valid? false,
+               :line-number 1,
+               :column-number 6,
+               :public-id nil,
+               :system-id nil,
+               :message (m/regex #"Cannot find the declaration of element 'foo'")}
+              (xml/validate "<foo></foo>"
+                            (io/resource "kaocha/junit_xml/JUnit.xsd")))))
