@@ -2,6 +2,7 @@
   (:require [clojure.test :refer :all]
             [clojure.xml :as cxml]
             [kaocha.plugin.junit-xml.xml :as xml]
+            [matcher-combinators.test]
             [matcher-combinators.matchers :as m]
             [clojure.java.io :as io]))
 
