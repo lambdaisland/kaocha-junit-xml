@@ -5,7 +5,9 @@
             [clojure.test :refer :all]
             [matcher-combinators.test]
             [clojure.string :as str]
-            [kaocha.plugin :as plugin])
+            [kaocha.plugin :as plugin]
+            [kaocha.plugin.junit-xml.xml :as xml]
+            [clojure.java.io :as io])
   (:import [java.nio.file Files]
            [java.nio.file.attribute FileAttribute]))
 
@@ -18,40 +20,54 @@
     xml))
 
 (deftest xml-output-test
-  (is (match? [:testuites {:skipped 1 :errors 2 :failures 1 :tests 4}
-               [:testsuite {:name "unit" :id 0 :hostname "localhost" :skipped 1 :errors 2 :failures 1 :tests 4}
-                [:testcase {:name "demo.test/basic-test" :classname "demo.test" :assertions 1}]
-                [:testcase {:name "demo.test/exception-in-is-test" :classname "demo.test" :assertions 1}
-                 [:error {:message "Inside assertion"
-                          :type "java.lang.Exception"}
-                  #(str/starts-with? % "expected: (throw (Exception.")]]
-                [:testcase {:name "demo.test/exception-outside-is-test" :classname "demo.test" :assertions 1}
-                 [:error {:message "outside assertion"
-                          :type "java.lang.Exception"}
-                  #(str/starts-with? % "expected: nil\n  actual: #error")]]
-                [:testcase {:name "demo.test/output-test" :classname "demo.test" :assertions 1}
-                 [:failure {:message
-                            "Expected:\n  {:foo 1}\nActual:\n  {:foo -1 +2}\n"
-                            :type '=}]
-                 [:system-out "this is on stdout\nthis is on stderr\n"]]
-                [:testcase {:name "demo.test/skip-test" :classname "demo.test" :assertions 0}
-                 [:skipped]]]]
+  (is (match?
+       [:testsuites
+        [:testsuite {:id 0
+                     :tests 4
+                     :failures 1
+                     :errors 2
+                     :package ""
+                     :name "unit"
+                     :hostname "localhost"
+                     :timestamp string?
+                     :time "0.000000"}
+         [:properties]
+         [:testcase {:name "demo.test/basic-test" :classname "demo.test" :time "0.000000"}]
+         [:testcase {:name "demo.test/exception-in-is-test"
+                     :classname "demo.test"
+                     :time "0.000000"}
+          [:error {:message "Inside assertion" :type "java.lang.Exception"}
+           #(str/starts-with? % "expected: (throw (Exception.")]]
+         [:testcase {:name "demo.test/exception-outside-is-test"
+                     :classname "demo.test"
+                     :time "0.000000"}
+          [:error {:message "outside assertion" :type "java.lang.Exception"}
+           #(str/starts-with? % "expected: nil\n  actual: #error")]]
+         [:testcase {:name "demo.test/output-test" :classname "demo.test"  :time "0.000000"}
+          [:failure {:message "Expected:\n  {:foo 1}\nActual:\n  {:foo -1 +2}\n" :type "="}]]
+         [:testcase {:name "demo.test/skip-test" :classname "demo.test"  :time "0.000000"}]
+         [:system-out "this is on stdout\nthis is on stderr\n"]
+         [:system-err]]]
 
-              (-> {:tests [{:test-paths ["resources/kaocha-demo"]
-                            :ns-patterns [".*"]}]
-                   :kaocha.plugin.randomize/randomize? false
-                   :color? false
-                   :reporter identity}
-                  repl/config
-                  api/run
-                  junit-xml/result->xml
-                  xml->hiccup)))
+       (-> {:tests [{:test-paths ["resources/kaocha-demo"]
+                     :ns-patterns [".*"]}]
+            :kaocha.plugin.randomize/randomize? false
+            :color? false
+            :reporter identity}
+           repl/config
+           api/run
+           junit-xml/result->xml
+           xml->hiccup)))
 
   (testing "it renders start-time when present"
-    (is (= [:testuites {:skipped 0, :errors 0, :failures 0, :tests 1}
+    (is (= [:testsuites
             [:testsuite {:name "my-test-type" :id 0 :hostname "localhost"
-                         :skipped 0 :errors 0 :failures 0 :tests 0
-                         :timestamp "2007-12-03T10:15:30" :time "0.000012"}]]
+                         :package ""
+                         :errors 0 :failures 0 :tests 0
+                         :timestamp "2007-12-03T10:15:30" :time "0.000012"}
+             [:properties]
+             [:system-out]
+             [:system-err]]]
            (-> {:kaocha.result/tests [{:kaocha.testable/id :my-test-type
                                        :kaocha.testable/type ::foo
                                        :kaocha.result/count 1
@@ -93,17 +109,30 @@
                                          :kaocha.plugin.profiling/start (java.time.Instant/parse "2007-12-03T10:15:30.00Z")
                                          :kaocha.plugin.profiling/duration 12345}]}]
       (plugin/run-hook* chain :kaocha.hooks/post-run result)
-      (is (= [:testuites {:tests "1"
-                          :failures "0"
-                          :errors "0"
-                          :skipped "0"}
+      (is (= [:testsuites
               [:testsuite {:errors "0"
                            :tests "0"
                            :name "my-test-type"
+                           :package ""
                            :time "0.000012"
                            :hostname "localhost"
-                           :skipped "0"
                            :id "0"
                            :timestamp "2007-12-03T10:15:30"
-                           :failures "0"}]]
+                           :failures "0"}
+               [:properties]
+               [:system-out]
+               [:system-err]]]
              (xml->hiccup (clojure.xml/parse (str outfile))))))))
+
+(deftest valid-xml-test
+  (testing "the output conforms to the JUnit.xsd schema"
+    (is (= {:valid? true}
+           (-> {:tests [{:test-paths ["resources/kaocha-demo"]
+                         :ns-patterns [".*"]}]
+                :kaocha.plugin.randomize/randomize? false
+                :color? false
+                :reporter identity}
+               repl/config
+               api/run
+               junit-xml/result->xml
+               (xml/validate (io/resource "kaocha/junit_xml/JUnit.xsd")))))))

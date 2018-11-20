@@ -65,6 +65,15 @@ jobs:
           path: test-results
 ```
 
+## Caveats
+
+For timing information (timestamp and running time) this plugin relies on the
+`kaocha.plugin/profiling` plugin. If the plugin is not present then a running
+time of 0 will be reported.
+
+For output capturing the `kaocha.plugin/capture-output` must be present. If it
+is not present `<system-out>` will always be empty.
+
 ## Resources
 
 It was hard to find a definitive source of the Ant Junit XML format. I mostly
@@ -72,6 +81,9 @@ went with [this page](http://llg.cubic.org/docs/junit/) for documentation.
 
 For information on how to configure CircleCI to use this information, see
 [store_test_results](https://circleci.com/docs/2.0/configuration-reference/#store_test_results).
+
+After reports that the output was not compatible with Azure Devops Pipeline the
+output was changed to adhere to [this schema](https://github.com/windyroad/JUnit-Schema/blob/49e95a79cc0bfba7961aaf779710a43a4d3f96bd/JUnit.xsd).
 
 <!-- license-epl -->
 ## License

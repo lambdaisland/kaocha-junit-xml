@@ -1,10 +1,16 @@
 # Unreleased
 
-## Added
-
 ## Fixed
 
+- Make XML output strictly conform to the JUnit XML schema ([#2](https://github.com/lambdaisland/kaocha-junit-xml/issues/2))
+
 ## Changed
+
+- Strip escape characters in text node, they are not valid XML
+- Strip ANSI color codes
+- Number of skipped tests and number of assertions are no longer reported. While
+  some sources seem to suggest they are part of the JUnit XML format, they are
+  not part of the schema, and so hinder validation.
 
 # 0.0-27 (2018-11-17 / a7f8432)
 
