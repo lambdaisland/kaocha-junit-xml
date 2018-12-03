@@ -1,14 +1,14 @@
 (ns kaocha.plugin.junit-xml.xml-test
-  (:require [clojure.test :refer :all]
-            [clojure.xml :as cxml]
+  (:require [clojure.java.io :as io]
+            [clojure.test :refer :all]
             [kaocha.plugin.junit-xml.xml :as xml]
             [matcher-combinators.test]
-            [matcher-combinators.matchers :as m]
-            [clojure.java.io :as io]))
+            [matcher-combinators.matchers :as m])
+  (:import java.io.FileInputStream))
 
 (deftest emit-test
   (testing "escapes text"
-    (is (= "<?xml version='1.0' encoding='UTF-8'?>\n<foo>\n&lt;hello&gt; &amp; &lt;world&gt; are &quot;great&quot;, aren&#27;t they?\n</foo>\n"
+    (is (= "<?xml version='1.0' encoding='UTF-8'?>\n<foo>\n&lt;hello&gt; &amp; &lt;world&gt; are &quot;great&quot;, aren&apos;t they?\n</foo>\n"
            (xml/emit-str {:tag :foo
                           :content ["<hello> & <world> are \"great\", aren't they?"]}))))
 
@@ -26,3 +26,10 @@
                :message (m/regex #"Cannot find the declaration of element 'foo'")}
               (xml/validate "<foo></foo>"
                             (io/resource "kaocha/junit_xml/JUnit.xsd")))))
+
+(deftest coercions-test
+  (let [schema-file (io/file (io/resource  "kaocha/junit_xml/JUnit.xsd"))
+        schema (xml/xml-schema schema-file)]
+    (is (= (xml/as-schema schema) schema))
+
+    (is (instance? javax.xml.transform.stream.StreamSource (xml/as-source (FileInputStream. schema-file))))))

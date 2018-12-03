@@ -4,7 +4,11 @@
 
 ## Fixed
 
+- Automatically create parent directory of output file if it doesn't exist
+
 ## Changed
+
+- Encode single quote as the more widely understood `&apos;` rather than `&#27;`
 
 # 0.0-31 (2018-11-20 / 060108f)
 
