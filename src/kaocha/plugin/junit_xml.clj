@@ -8,7 +8,9 @@
             [kaocha.result :as result]
             [kaocha.testable :as testable]
             [clojure.string :as str])
-  (:import java.time.Instant))
+  (:import java.time.Instant
+           java.nio.file.Files
+           java.nio.file.attribute.FileAttribute))
 
 (defn inst->iso8601 [inst]
   (.. java.time.format.DateTimeFormatter/ISO_LOCAL_DATE_TIME
@@ -54,9 +56,11 @@
    (with-out-str
      (run! report/print-expr events))))
 
-(defn error-type [events]
-  (let [e (first (filter #(throwable? (:actual %)) events))]
-    (.getName (class (:actual e)))))
+(defn events->exception [events]
+  (:actual (first (filter #(throwable? (:actual %)) events))))
+
+(defn classname [obj]
+  (.getName (class obj)))
 
 (defn testcase->xml [test]
   (let [{::testable/keys [id skip events]
@@ -69,11 +73,12 @@
      :content (keep identity
                     [(cond
                        (> error 0) (let [events (filter (comp #{:error} :type) events)
-                                         message (some-> events first :actual (.getMessage))
+                                         exception (events->exception events)
+                                         message (.getMessage exception)
                                          trace (failure-message events)]
                                      {:tag   :error
                                       :attrs {:message message
-                                              :type    (error-type (::testable/events test))}
+                                              :type    (classname exception)}
                                       :content [trace]})
                        (> fail 0)  {:tag   :failure
                                     :attrs {:message (->> events
@@ -110,10 +115,17 @@
      :attrs   {}
      :content (map suite->xml suites (range))}))
 
+(defn mkparent [path]
+  (when-let [parent (.getParent path) ]
+    (let [ppath (.toPath (io/file parent))]
+      (Files/createDirectories ppath (into-array FileAttribute [])))))
+
 (defn write-junit-xml [filename result]
-  (with-open [f (io/writer (io/file filename))]
-    (binding [*out* f]
-      (xml/emit (result->xml result)))))
+  (let [file (io/file filename)]
+    (mkparent file)
+    (with-open [f (io/writer file)]
+      (binding [*out* f]
+        (xml/emit (result->xml result))))))
 
 (defplugin kaocha.plugin/junit-xml
   "Write test results to junit.xml"

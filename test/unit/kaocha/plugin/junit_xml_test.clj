@@ -7,7 +7,8 @@
             [clojure.string :as str]
             [kaocha.plugin :as plugin]
             [kaocha.plugin.junit-xml.xml :as xml]
-            [clojure.java.io :as io])
+            [clojure.java.io :as io]
+            [clojure.xml])
   (:import [java.nio.file Files]
            [java.nio.file.attribute FileAttribute]))
 
@@ -78,6 +79,58 @@
                                        :kaocha.plugin.profiling/duration 12345}]}
                junit-xml/result->xml
                xml->hiccup)))))
+
+(deftest makeparent-test
+  (junit-xml/mkparent (io/file "target/foo/bar/baz.xml"))
+  (is (.isDirectory (io/file "target/foo/bar")))
+  (.delete (io/file "target/foo/bar"))
+  (.delete (io/file "target/foo")))
+
+(deftest testcase->xml-test
+  (is (match? {:tag :testcase
+               :attrs {:name "my-test-case" :classname nil :time "0.000000"}
+               :content
+               [{:tag :error
+                 :attrs {:message "oh no" :type "java.lang.Exception"}
+                 :content
+                 [string?]}]}
+
+              (junit-xml/testcase->xml
+               {:kaocha.testable/id :my-test-case
+                :kaocha.result/error 1
+                :kaocha.testable/events [{:type :error
+                                          :actual (Exception. "oh no")}]}))))
+
+(deftest suite->xml-test
+  (is (match? {:tag :testsuite
+               :attrs {:errors 0
+                       :package "foo"
+                       :tests 0
+                       :name "foo/bar"
+                       :time "0.000000"
+                       :hostname "localhost"
+                       :id 0
+                       :failures 0}
+               :content
+               [{:tag :properties}
+                {:tag :system-out :content ()}
+                {:tag :system-err}]}
+              (junit-xml/suite->xml {:kaocha.testable/id :foo/bar} 0)))
+
+  (is (match? {:tag :testsuite
+               :attrs {:errors 0
+                       :package ""
+                       :tests 0
+                       :name "foo"
+                       :time "0.000000"
+                       :hostname "localhost"
+                       :id 0
+                       :failures 0}
+               :content
+               [{:tag :properties}
+                {:tag :system-out :content ()}
+                {:tag :system-err}]}
+              (junit-xml/suite->xml {:kaocha.testable/id :foo} 0))))
 
 (deftest junit-xml-plugin
   (testing "cli-options"
