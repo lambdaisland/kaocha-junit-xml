@@ -1,10 +1,8 @@
 # Unreleased
 
-## Added
-
 ## Fixed
 
-## Changed
+- Address cljdoc analysis error preventing the docs to build
 
 # 0.0-39 (2018-12-05 / 1507bab)
 
