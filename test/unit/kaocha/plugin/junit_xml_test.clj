@@ -50,7 +50,7 @@
          [:system-out "this is on stdout\nthis is on stderr\n"]
          [:system-err]]]
 
-       (-> {:tests [{:test-paths ["resources/kaocha-demo"]
+       (-> {:tests [{:test-paths ["fixtures/kaocha-demo"]
                      :ns-patterns [".*"]}]
             :kaocha.plugin.randomize/randomize? false
             :color? false
@@ -180,7 +180,7 @@
 (deftest valid-xml-test
   (testing "the output conforms to the JUnit.xsd schema"
     (is (= {:valid? true}
-           (-> {:tests [{:test-paths ["resources/kaocha-demo"]
+           (-> {:tests [{:test-paths ["fixtures/kaocha-demo"]
                          :ns-patterns [".*"]}]
                 :kaocha.plugin.randomize/randomize? false
                 :color? false
