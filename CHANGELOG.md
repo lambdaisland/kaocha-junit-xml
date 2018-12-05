@@ -1,7 +1,5 @@
 # Unreleased
 
-## Added
-
 ## Fixed
 
 - Automatically create parent directory of output file if it doesn't exist

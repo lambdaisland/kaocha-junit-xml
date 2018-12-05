@@ -9,12 +9,4 @@
   :test
   {:extra-deps {nubank/matcher-combinators    {:mvn/version "0.4.2"}
                 org.clojure/data.xml          {:mvn/version "0.0.8"}
-                lambdaisland/kaocha-cloverage {:mvn/version "0.0-6"}}}
-
-  :junit-xml
-  {}
-
-  :clojure-1.9
-  {:extra-deps
-   ^:depot/ignore
-   {org.clojure/clojure {:mvn/version "1.9.0"}}}}}
+                lambdaisland/kaocha-cloverage {:mvn/version "0.0-6"}}}}}
