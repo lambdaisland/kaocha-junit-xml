@@ -15,7 +15,7 @@
 {:aliases
  {:test
   {:extra-deps {lambdaisland/kaocha {...}
-                lambdaisland/kaocha-junit-xml {:mvn/version "0.0-10"}}}}}
+                lambdaisland/kaocha-junit-xml {:mvn/version "0.0-43"}}}}}
 ```
 
 or
@@ -24,7 +24,7 @@ or
 ;; project.clj
 (defproject ,,,
   :dependencies [,,,
-                 [lambdaisland/kaocha-junit-xml "0.0-10"]])
+                 [lambdaisland/kaocha-junit-xml "0.0-43"]])
 ```
 
 - Enable the plugin and set an output file
@@ -44,7 +44,7 @@ bin/kaocha --plugin kaocha.plugin/junit-xml --junit-xml-file junit.xml
 
 ## Requirements
 
-Requires at least Kaocha 0.0-239 and Clojure 1.9.
+Requires at least Kaocha 0.0-306 and Clojure 1.9.
 
 ## CircleCI
 
