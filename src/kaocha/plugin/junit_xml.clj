@@ -28,8 +28,7 @@
   (cons testable (mapcat test-seq (::result/tests testable))))
 
 (defn leaf-tests [testable]
-  (filter #(isa? (::testable/type %) :kaocha.testable.type/leaf)
-          (test-seq testable)))
+  (filter hierarchy/leaf? (test-seq testable)))
 
 (defn time-stat [testable]
   (let [duration (:kaocha.plugin.profiling/duration testable 0)]

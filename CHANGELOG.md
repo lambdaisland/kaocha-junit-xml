@@ -1,10 +1,9 @@
 # Unreleased
 
-## Added
-
 ## Fixed
 
-## Changed
+- Detect "leaf" test types through Kaocha's hierarchy functions, this fixes
+  compatibility with `kaocha-cucumber`
 
 # 0.0-43 (2018-12-05 / 311587e)
 
