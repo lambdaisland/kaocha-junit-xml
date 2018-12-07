@@ -1,4 +1,4 @@
-# Unreleased
+# 0.0-47 (2018-12-07 / db418fa)
 
 ## Fixed
 
