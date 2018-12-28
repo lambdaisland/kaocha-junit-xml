@@ -8,9 +8,11 @@
             [kaocha.plugin :as plugin]
             [kaocha.plugin.junit-xml.xml :as xml]
             [clojure.java.io :as io]
-            [clojure.xml])
+            [clojure.xml]
+            [kaocha.report :as report])
   (:import [java.nio.file Files]
-           [java.nio.file.attribute FileAttribute]))
+           [java.nio.file.attribute FileAttribute]
+           [javax.xml.parsers SAXParser SAXParserFactory]))
 
 (java.util.TimeZone/setDefault (java.util.TimeZone/getTimeZone "UTC"))
 
@@ -38,15 +40,36 @@
                      :classname "demo.test"
                      :time "0.000000"}
           [:error {:message "Inside assertion" :type "java.lang.Exception"}
-           #(str/starts-with? % "expected: (throw (Exception.")]]
+           #(str/starts-with? % (str "ERROR in demo.test/exception-in-is-test (test.clj:15)\n"
+                                     "Exception: java.lang.Exception: Inside assertion\n"
+                                     " at demo.test"))]]
          [:testcase {:name "demo.test/exception-outside-is-test"
                      :classname "demo.test"
                      :time "0.000000"}
-          [:error {:message "outside assertion" :type "java.lang.Exception"}
-           #(str/starts-with? % "expected: nil\n  actual: #error")]]
-         [:testcase {:name "demo.test/output-test" :classname "demo.test"  :time "0.000000"}
-          [:failure {:message "Expected:\n  {:foo 1}\nActual:\n  {:foo -1 +2}\n" :type "="}]]
-         [:testcase {:name "demo.test/skip-test" :classname "demo.test"  :time "0.000000"}]
+          [:error {:message "Uncaught exception, not in assertion."
+                   :type "java.lang.Exception"}
+           #(str/starts-with? % (str "ERROR in demo.test/exception-outside-is-test (test.clj:19)\n"
+                                     "Uncaught exception, not in assertion.\n"
+                                     "Exception: java.lang.Exception: outside assertion\n"
+                                     " at demo.test"))]]
+         [:testcase {:name "demo.test/output-test"
+                     :classname "demo.test"
+                     :time "0.000000"}
+          [:failure {:message "[:fail] expected: (= {:foo 1} {:foo 2}). actual: (not (= {:foo 1} {:foo 2}))"
+                     :type "assertion failure: ="}
+           (str "FAIL in demo.test/output-test (test.clj:13)\n"
+                "oops\n"
+                "Expected:\n"
+                "  {:foo 1}\n"
+                "Actual:\n"
+                "  {:foo -1 +2}\n"
+                "╭───── Test output ───────────────────────────────────────────────────────\n"
+                "│ this is on stdout\n"
+                "│ this is on stderr\n"
+                "╰─────────────────────────────────────────────────────────────────────────")]]
+         [:testcase {:name "demo.test/skip-test"
+                     :classname "demo.test"
+                     :time "0.000000"}]
          [:system-out "this is on stdout\nthis is on stderr\n"]
          [:system-err]]]
 
@@ -80,6 +103,7 @@
                junit-xml/result->xml
                xml->hiccup)))))
 
+
 (deftest makeparent-test
   (junit-xml/mkparent (io/file "target/foo/bar/baz.xml"))
   (is (.isDirectory (io/file "target/foo/bar")))
@@ -87,19 +111,32 @@
   (.delete (io/file "target/foo")))
 
 (deftest testcase->xml-test
-  (is (match? {:tag :testcase
-               :attrs {:name "my-test-case" :classname nil :time "0.000000"}
-               :content
-               [{:tag :error
-                 :attrs {:message "oh no" :type "java.lang.Exception"}
-                 :content
-                 [string?]}]}
+  (is (match?
+       [:testcase
+        {:name "my.app/my-test-case", :classname "my.app", :time "0.000000"}
+        [:failure
+         {:message
+          "[:fail] expected: (= {:foo 4} {:foo 5}). actual: (not (= {:foo 4} {:foo 5}))",
+          :type "assertion failure: ="}
+         "FAIL in  (bar.clj:108)\nExpected:\n  {:foo 4}\nActual:\n  {:foo -4 +5}"]
+        [:error
+         {:message "oh no", :type "java.lang.Exception"}
+         #(str/starts-with? % "ERROR in  (foo.clj:42)\nException: java.lang.Exception: oh no\n at kaocha.plugin.junit_xml_test")]]
 
-              (junit-xml/testcase->xml
-               {:kaocha.testable/id :my-test-case
-                :kaocha.result/error 1
-                :kaocha.testable/events [{:type :error
-                                          :actual (Exception. "oh no")}]}))))
+       (-> {:kaocha.testable/id :my.app/my-test-case
+            :kaocha.result/error 1
+            :kaocha.testable/events [{:file "bar.clj"
+                                      :line 108
+                                      :type :fail
+                                      :expected '(= {:foo 4} {:foo 5}),
+                                      :actual '(not (= {:foo 4} {:foo 5}))
+                                      :message nil}
+                                     {:file "foo.clj"
+                                      :line 42
+                                      :type :error
+                                      :actual (Exception. "oh no")}]}
+           junit-xml/testcase->xml
+           xml->hiccup))))
 
 (deftest suite->xml-test
   (is (match? {:tag :testsuite
@@ -175,7 +212,13 @@
                [:properties]
                [:system-out]
                [:system-err]]]
-             (xml->hiccup (clojure.xml/parse (str outfile))))))))
+             (xml->hiccup (clojure.xml/parse (io/file (str outfile))
+                                             (fn [s ch]
+                                               (let [parser (.. SAXParserFactory (newInstance) (newSAXParser))]
+                                                 ;; avoid reflection warnings
+                                                 (.parse ^SAXParser parser
+                                                         ^java.io.File s
+                                                         ^org.xml.sax.helpers.DefaultHandler ch))))))))))
 
 (deftest valid-xml-test
   (testing "the output conforms to the JUnit.xsd schema"

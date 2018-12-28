@@ -1,3 +1,23 @@
+# Unreleased
+
+## Changed
+
+- The rendering of errors and failures has been made more in line with what
+  consumers expect, with a one-line message attribute, and with full multiline
+  output as a text element.
+- Each failure and error is now output as a separate XML element, rather than
+  being grouped into a single element for each type.
+- Rendering of errors (exceptions) will look for a
+  `:kaocha.report/error-message` and `:kaocha.report/error-type`, before falling
+  back to calling `.getMessage` / `.getClass` on the Exception. This is for
+  cases like ClojureScript where the error is originating and captured outside
+  the JVM.
+
+## Fixed
+
+- Fixed an issue in the code that strips out ANSI escape sequences, to prevent
+  it from eating up some of the input.
+
 # 0.0-47 (2018-12-07 / db418fa)
 
 ## Fixed

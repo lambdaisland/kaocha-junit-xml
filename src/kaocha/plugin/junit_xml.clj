@@ -22,7 +22,7 @@
 ;; bytes" in the range 0x20–0x2F (ASCII space and !"#$%&'()*+,-./), then finally
 ;; by a single "final byte" in the range 0x40–0x7E (ASCII @A–Z[\]^_`a–z{|}~).
 (defn strip-ansi-sequences [s]
-  (str/replace s #"\x1b\[[\x30-x3F]*[\x20-\x2F]*[\x40-\x7E]" ""))
+  (str/replace s #"\x1b\[[\x30-\x3F]*[\x20-\x2F]*[\x40-\x7E]" ""))
 
 (defn test-seq [testable]
   (cons testable (mapcat test-seq (::result/tests testable))))
@@ -50,16 +50,38 @@
            (str n "/"))
          (name id))))
 
-(defn failure-message [events]
-  (strip-ansi-sequences
-   (with-out-str
-     (run! report/print-expr events))))
-
-(defn events->exception [events]
-  (:actual (first (filter #(throwable? (:actual %)) events))))
+(defn failure-message [m]
+  (str/trim
+   (strip-ansi-sequences
+    (with-out-str
+      (report/fail-summary m)))))
 
 (defn classname [obj]
   (.getName (class obj)))
+
+(defn failure->xml [m]
+  (let [assertion-type (report/assertion-type m)]
+    {:tag   :failure
+     :attrs {:message (format "[%s] expected: %s. actual: %s"
+                              (:type m)
+                              (:expected m)
+                              (:actual m))
+             :type    (str "assertion failure"
+                           (when-not (= :default assertion-type)
+                             (str ": " assertion-type)))}
+     :content [(failure-message m)]}))
+
+(defn error->xml [m]
+  (let [exception (when (throwable? (:actual m))
+                    (:actual m))]
+    {:tag   :error
+     :attrs {:message (or (:message m)
+                          (when exception
+                            (.getMessage exception)))
+             :type    (if exception
+                        (classname exception)
+                        ":error")}
+     :content [(failure-message m)]}))
 
 (defn testcase->xml [test]
   (let [{::testable/keys [id skip events]
@@ -69,23 +91,11 @@
      :attrs   (merge {:name       (test-name test)
                       :classname  (namespace id)}
                      (time-stat test))
-     :content (keep identity
-                    [(cond
-                       (> error 0) (let [events (filter (comp #{:error} :type) events)
-                                         exception (events->exception events)
-                                         message (.getMessage exception)
-                                         trace (failure-message events)]
-                                     {:tag   :error
-                                      :attrs {:message message
-                                              :type    (classname exception)}
-                                      :content [trace]})
-                       (> fail 0)  {:tag   :failure
-                                    :attrs {:message (->> events
-                                                          (filter #(and (hierarchy/fail-type? %)
-                                                                        (not (= :error (:type %)))))
-                                                          failure-message)
-                                            :type    (str (first (remove #{:default} (map report/assertion-type events))))}})
-                     ])}))
+     :content (keep (fn [m]
+                      (cond
+                        (hierarchy/error-type? m) (error->xml m)
+                        (hierarchy/fail-type? m) (failure->xml m)))
+                    events)}))
 
 (defn suite->xml [suite index]
   (let [id (::testable/id suite)]
