@@ -87,15 +87,18 @@
     (is (= [:testsuites
             [:testsuite {:name "my-test-type" :id 0 :hostname "localhost"
                          :package ""
-                         :errors 0 :failures 0 :tests 0
+                         :errors 0 :failures 1 :tests 1
                          :timestamp "2007-12-03T10:15:30" :time "0.000012"}
              [:properties]
+             [:testcase {:classname nil
+                         :name "my-test-type"
+                         :time "0.000012"}]
              [:system-out]
              [:system-err]]]
            (-> {:kaocha.result/tests [{:kaocha.testable/id :my-test-type
                                        :kaocha.testable/type ::foo
                                        :kaocha.result/count 1
-                                       :kaocha.result/fail 0
+                                       :kaocha.result/fail 1
                                        :kaocha.result/pass 1
                                        :kaocha.result/error 0
                                        :kaocha.plugin.profiling/start (java.time.Instant/parse "2007-12-03T10:15:30.00Z")
@@ -201,7 +204,7 @@
       (plugin/run-hook* chain :kaocha.hooks/post-run result)
       (is (= [:testsuites
               [:testsuite {:errors "0"
-                           :tests "0"
+                           :tests "1"
                            :name "my-test-type"
                            :package ""
                            :time "0.000012"

@@ -1,10 +1,9 @@
 # Unreleased
 
-## Added
-
 ## Fixed
 
-## Changed
+- Render non-leaf test types (e.g. clojure.test / ns) if they contain failures
+  or errors (e.g. load errors).
 
 # 0.0-50 (2018-12-28 / d44f155)
 

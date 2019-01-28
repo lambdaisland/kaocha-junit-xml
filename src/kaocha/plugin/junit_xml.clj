@@ -28,7 +28,9 @@
   (cons testable (mapcat test-seq (::result/tests testable))))
 
 (defn leaf-tests [testable]
-  (filter hierarchy/leaf? (test-seq testable)))
+  (filter #(or (hierarchy/leaf? %)
+               (result/failed-one? %))
+          (test-seq testable)))
 
 (defn time-stat [testable]
   (let [duration (:kaocha.plugin.profiling/duration testable 0)]
@@ -37,7 +39,7 @@
 
 (defn stats [testable]
   (let [tests      (test-seq testable)
-        totals     (result/totals (::result/tests testable))
+        totals     (result/testable-totals testable)
         start-time (:kaocha.plugin.profiling/start testable (Instant/now))]
     {:errors   (::result/error totals)
      :failures (::result/fail totals)
