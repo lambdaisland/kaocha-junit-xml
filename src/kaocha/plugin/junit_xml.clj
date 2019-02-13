@@ -1,4 +1,5 @@
 (ns kaocha.plugin.junit-xml
+  (:refer-clojure :exclude [symbol])
   (:require [clojure.java.io :as io]
             [kaocha.core-ext :refer :all]
             [kaocha.hierarchy :as hierarchy]
