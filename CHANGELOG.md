@@ -8,11 +8,9 @@
 
 # 0.0-57 (2019-02-15 / 3804cb7)
 
-## Added
-
 ## Fixed
 
-## Changed
+- Addressed a warning.
 
 # 0.0-53 (2019-01-28 / 69d2e2f)
 
