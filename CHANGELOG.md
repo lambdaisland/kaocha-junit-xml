@@ -1,10 +1,8 @@
 # Unreleased
 
-## Added
-
 ## Fixed
 
-## Changed
+- Fix potential NullPointerException
 
 # 0.0-57 (2019-02-15 / 3804cb7)
 
