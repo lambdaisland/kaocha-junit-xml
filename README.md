@@ -85,6 +85,25 @@ For information on how to configure CircleCI to use this information, see
 After reports that the output was not compatible with Azure Devops Pipeline the
 output was changed to adhere to [this schema](https://github.com/windyroad/JUnit-Schema/blob/49e95a79cc0bfba7961aaf779710a43a4d3f96bd/JUnit.xsd).
 
+### Gitlab
+
+Configuring Gitlab to parse JUnit XML is easy; just add a `report` artifact that
+points to the XML file:
+
+```yaml
+test:
+  only:
+    -tags
+  script:
+    - make test
+  artifacts:
+    reports:
+      junit: junit.xml
+```
+
+See the [Gitlab documentation on reports using
+JUnit](https://docs.gitlab.com/ce/ci/junit_test_reports.html) for more information.
+
 <!-- license-epl -->
 ## License
 
