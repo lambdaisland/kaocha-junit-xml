@@ -1,10 +1,8 @@
 # Unreleased
 
-## Added
-
 ## Fixed
 
-## Changed
+- `<` and `>` are now escaped in XML attributes
 
 # 0.0-63 (2019-02-15 / 5243781)
 
