@@ -26,7 +26,7 @@
   (-> s
       (or "")
       (str/replace #"[^\x09\x0A\x0D\x20-\xD7FF\xE000-\xFFFD]" "")
-      (str/replace #"[&\"]" entities)))
+      (str/replace #"[&\"<>]" entities)))
 
 (defn emit-attr [[k v]]
   (print (str " " (name k) "=\"" (escape-attr v) "\"")))
