@@ -15,7 +15,7 @@
 {:aliases
  {:test
   {:extra-deps {lambdaisland/kaocha {...}
-                lambdaisland/kaocha-junit-xml {:mvn/version "0.0-63"}}}}}
+                lambdaisland/kaocha-junit-xml {:mvn/version "0.0-70"}}}}}
 ```
 
 or
@@ -24,7 +24,7 @@ or
 ;; project.clj
 (defproject ,,,
   :dependencies [,,,
-                 [lambdaisland/kaocha-junit-xml "0.0-63"]])
+                 [lambdaisland/kaocha-junit-xml "0.0-70"]])
 ```
 
 - Enable the plugin and set an output file
