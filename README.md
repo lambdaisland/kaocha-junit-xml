@@ -106,8 +106,8 @@ JUnit](https://docs.gitlab.com/ce/ci/junit_test_reports.html) for more informati
 
 <!-- license-epl -->
 ## License
-
-Copyright &copy; 2018 Arne Brasseur
-
+&nbsp;
+Copyright &copy; 2018-2019 Arne Brasseur
+&nbsp;
 Available under the terms of the Eclipse Public License 1.0, see LICENSE.txt
 <!-- /license-epl -->
