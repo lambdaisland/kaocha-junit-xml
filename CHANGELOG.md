@@ -2,9 +2,7 @@
 
 ## Added
 
-## Fixed
-
-## Changed
+- Added a flag to omit `system-out` from the generated junit.xml file, (thanks @ondrs)
 
 # 0.0-70 (2019-03-30 / 0377e39)
 
