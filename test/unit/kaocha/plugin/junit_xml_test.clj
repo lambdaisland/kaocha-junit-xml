@@ -155,7 +155,7 @@
                [{:tag :properties}
                 {:tag :system-out :content ()}
                 {:tag :system-err}]}
-              (junit-xml/suite->xml {:kaocha.testable/id :foo/bar} 0)))
+              (junit-xml/suite->xml {} {:kaocha.testable/id :foo/bar} 0)))
 
   (is (match? {:tag :testsuite
                :attrs {:errors 0
@@ -170,11 +170,31 @@
                [{:tag :properties}
                 {:tag :system-out :content ()}
                 {:tag :system-err}]}
-              (junit-xml/suite->xml {:kaocha.testable/id :foo} 0))))
+              (junit-xml/suite->xml {} {:kaocha.testable/id :foo} 0)))
+
+  (is (match? {:tag :testsuite
+               :attrs {:errors 0
+                       :package ""
+                       :tests 0
+                       :name "foo"
+                       :time "0.000000"
+                       :hostname "localhost"
+                       :id 0
+                       :failures 0}
+               :content
+               [{:tag :properties}
+                {:tag :system-out}
+                {:tag :system-err}]}
+              (junit-xml/suite->xml {:no-system-out? true} {:kaocha.testable/id :foo} 0))))
 
 (deftest junit-xml-plugin
   (testing "cli-options"
-    (is (= [[nil "--junit-xml-file FILENAME" "Save the test results to a Ant JUnit XML file."]]
+    (is (= [[nil
+             "--junit-xml-file FILENAME"
+             "Save the test results to a Ant JUnit XML file."
+
+             "--junit-xml-omit-system-out"
+             "Do not add captured output to junit.xml"]]
            (let [chain (plugin/load-all [:kaocha.plugin/junit-xml])]
              (plugin/run-hook* chain :kaocha.hooks/cli-options [])))))
 

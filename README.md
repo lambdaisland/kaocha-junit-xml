@@ -42,6 +42,22 @@ Or from the CLI
 bin/kaocha --plugin kaocha.plugin/junit-xml --junit-xml-file junit.xml
 ```
 
+Optionally you can omit captured output from junit.xml
+
+``` clojure
+;; tests.edn
+#kaocha/v1
+{:plugins [:kaocha.plugin/junit-xml]
+ :kaocha.plugin.junit-xml/target-file      "junit.xml"
+ :kaocha.plugin.junit-xml/omit-system-out? true}
+```
+
+Or from the CLI
+
+``` shell
+bin/kaocha --plugin kaocha.plugin/junit-xml --junit-xml-file junit.xml --junit-xml-omit-system-out
+```
+
 ## Requirements
 
 Requires at least Kaocha 0.0-306 and Clojure 1.9.

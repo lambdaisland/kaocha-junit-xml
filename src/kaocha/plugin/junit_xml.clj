@@ -100,32 +100,35 @@
                         (hierarchy/fail-type? m) (failure->xml m)))
                     events)}))
 
-(defn suite->xml [suite index]
+(defn suite->xml [{::keys [omit-system-out?]} suite index]
   (let [id (::testable/id suite)]
-    {:tag :testsuite
-     :attrs (-> {:name (test-name suite)
-                 :id index
-                 :hostname "localhost"}
-                (merge (stats suite) (time-stat suite))
-                (assoc :package (if (qualified-ident? id)
-                                  (namespace id)
-                                  "")))
+    {:tag     :testsuite
+     :attrs   (-> {:name     (test-name suite)
+                   :id       index
+                   :hostname "localhost"}
+                  (merge (stats suite) (time-stat suite))
+                  (assoc :package (if (qualified-ident? id)
+                                    (namespace id)
+                                    "")))
      :content (concat
-               [{:tag :properties}]
-               (map testcase->xml (leaf-tests suite))
-               [{:tag :system-out
-                 :content (->> suite
-                               test-seq
-                               (keep :kaocha.plugin.capture-output/output)
-                               (remove #{""})
-                               (map strip-ansi-sequences))}
-                {:tag :system-err}])}))
+                [{:tag :properties}]
+                (map testcase->xml (leaf-tests suite))
+                [(merge {:tag :system-out}
+                        (when-not omit-system-out?
+                          {:content (->> suite
+                                         test-seq
+                                         (keep :kaocha.plugin.capture-output/output)
+                                         (remove #{""})
+                                         (map strip-ansi-sequences))}))
+                 {:tag :system-err}])}))
 
 (defn result->xml [result]
   (let [suites (::result/tests result)]
     {:tag     :testsuites
      :attrs   {}
-     :content (map suite->xml suites (range))}))
+     :content (map (partial suite->xml result)
+                   suites
+                   (range))}))
 
 (defn mkparent [path]
   (when-let [parent (.getParent path) ]
@@ -143,12 +146,23 @@
   "Write test results to junit.xml"
 
   (cli-options [opts]
-    (conj opts [nil "--junit-xml-file FILENAME" "Save the test results to a Ant JUnit XML file."]))
+    (conj opts [nil
+                "--junit-xml-file FILENAME"
+                "Save the test results to a Ant JUnit XML file."
+
+                "--junit-xml-omit-system-out"
+                "Do not add captured output to junit.xml"]))
 
   (config [config]
-    (if-let [target (get-in config [:kaocha/cli-options :junit-xml-file])]
-      (assoc config ::target-file target)
-      config))
+    (let [target-file      (get-in config [:kaocha/cli-options :junit-xml-file])
+          omit-system-out? (get-in config [:kaocha/cli-options :junit-xml-omit-system-out])]
+      (cond-> config
+
+              target-file
+              (assoc ::target-file target-file)
+
+              omit-system-out?
+              (assoc ::omit-system-out? true))))
 
   (post-run [result]
     (when-let [filename (::target-file result)]
