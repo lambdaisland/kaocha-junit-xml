@@ -10,7 +10,7 @@
             [clojure.java.io :as io]
             [clojure.xml]
             [kaocha.report :as report])
-  (:import [java.nio.file Files]
+  (:import [java.nio.file Files Paths]
            [java.nio.file.attribute FileAttribute]
            [javax.xml.parsers SAXParser SAXParserFactory]))
 
@@ -21,6 +21,11 @@
     (let [{:keys [tag attrs content]} xml]
       `[~tag ~@(when (seq attrs) [attrs]) ~@(map xml->hiccup content)])
     xml))
+
+(defn abs-path [test-path test-file]
+  (.. (io/file test-path test-file)
+      getAbsolutePath
+      toString))
 
 (deftest xml-output-test
   (is (match?
@@ -83,28 +88,101 @@
            junit-xml/result->xml
            xml->hiccup)))
 
-  (testing "it renders start-time when present"
-    (is (= [:testsuites
-            [:testsuite {:name "my-test-type" :id 0 :hostname "localhost"
-                         :package ""
-                         :errors 0 :failures 1 :tests 1
-                         :timestamp "2007-12-03T10:15:30" :time "0.000012"}
-             [:properties]
-             [:testcase {:classname nil
-                         :name "my-test-type"
-                         :time "0.000012"}]
-             [:system-out]
-             [:system-err]]]
-           (-> {:kaocha.result/tests [{:kaocha.testable/id :my-test-type
-                                       :kaocha.testable/type ::foo
-                                       :kaocha.result/count 1
-                                       :kaocha.result/fail 1
-                                       :kaocha.result/pass 1
-                                       :kaocha.result/error 0
-                                       :kaocha.plugin.profiling/start (java.time.Instant/parse "2007-12-03T10:15:30.00Z")
-                                       :kaocha.plugin.profiling/duration 12345}]}
-               junit-xml/result->xml
-               xml->hiccup)))))
+  (testing "it outputs location metadata when configured"
+    (is (match?
+         [:testsuites
+          [:testsuite {:id 0
+                       :tests 4
+                       :failures 1
+                       :errors 2
+                       :package ""
+                       :name "unit"
+                       :hostname "localhost"
+                       :timestamp string?
+                       :time "0.000000"}
+           [:properties]
+           [:testcase {:name "demo.test/basic-test" :classname "demo.test" :time "0.000000"}]
+           [:testcase {:name "demo.test/exception-in-is-test"
+                       :classname "demo.test"
+                       :time "0.000000"
+                       :column 1
+                       :file (abs-path "fixtures/kaocha-demo" "demo/test.clj")
+                       :line 15}
+            [:error {:message "Inside assertion" :type "java.lang.Exception"}
+             #(str/starts-with? % (str "ERROR in demo.test/exception-in-is-test (test.clj:15)\n"
+                                       "it outputs location metadata when configured\n"
+                                       "Exception: java.lang.Exception: Inside assertion\n"
+                                       " at demo.test"))]]
+           [:testcase {:name "demo.test/exception-outside-is-test"
+                       :classname "demo.test"
+                       :time "0.000000"
+                       :column 1
+                       :file (abs-path "fixtures/kaocha-demo" "demo/test.clj")
+                       :line 19}
+            [:error {:message "Uncaught exception, not in assertion."
+                     :type "java.lang.Exception"}
+             #(str/starts-with? % (str "ERROR in demo.test/exception-outside-is-test (test.clj:19)\n"
+                                       "it outputs location metadata when configured\n"
+                                       "Uncaught exception, not in assertion.\n"
+                                       "Exception: java.lang.Exception: outside assertion\n"
+                                       " at demo.test"))]]
+           [:testcase {:name "demo.test/output-test"
+                       :classname "demo.test"
+                       :time "0.000000"
+                       :column 1
+                       :line 7
+                       :file (abs-path "fixtures/kaocha-demo" "demo/test.clj")}
+            [:failure {:message "[:fail] expected: (= {:foo 1} {:foo 2}). actual: (not (= {:foo 1} {:foo 2}))"
+                       :type "assertion failure: ="}
+             (str "FAIL in demo.test/output-test (test.clj:13)\n"
+                  "it outputs location metadata when configured\n"
+                  "oops\n"
+                  "Expected:\n"
+                  "  {:foo 1}\n"
+                  "Actual:\n"
+                  "  {:foo -1 +2}\n"
+                  "╭───── Test output ───────────────────────────────────────────────────────\n"
+                  "│ this is on stdout\n"
+                  "│ this is on stderr\n"
+                  "╰─────────────────────────────────────────────────────────────────────────")]]
+           [:testcase {:name "demo.test/skip-test"
+                       :classname "demo.test"
+                       :time "0.000000"}]
+           [:system-out "this is on stdout\nthis is on stderr\n"]
+           [:system-err]]]
+
+         (-> {:tests [{:test-paths ["fixtures/kaocha-demo"]
+                       :ns-patterns [".*"]}]
+              :kaocha.plugin.randomize/randomize? false
+              :kaocha.plugin.junit-xml/add-location-metadata? true
+              :color? false
+              :reporter identity}
+             repl/config
+             api/run
+             junit-xml/result->xml
+             xml->hiccup))))
+    (testing "it renders start-time when present"
+      (is (= [:testsuites
+              [:testsuite {:name "my-test-type" :id 0 :hostname "localhost"
+                           :package ""
+                           :errors 0 :failures 1 :tests 1
+                           :timestamp "2007-12-03T10:15:30" :time "0.000012"}
+               [:properties]
+               [:testcase {:classname nil
+                           :name "my-test-type"
+                           :time "0.000012"}]
+               [:system-out]
+               [:system-err]]]
+             (-> {:kaocha.result/tests [{:kaocha.testable/id :my-test-type
+                                         :kaocha.testable/type ::foo
+                                         :kaocha.result/count 1
+                                         :kaocha.result/fail 1
+                                         :kaocha.result/pass 1
+                                         :kaocha.result/error 0
+                                         :kaocha.plugin.profiling/start (java.time.Instant/parse "2007-12-03T10:15:30.00Z")
+                                         :kaocha.plugin.profiling/duration 12345}]}
+                 junit-xml/result->xml
+                 xml->hiccup)))))
 
 
 (deftest makeparent-test
@@ -126,20 +204,20 @@
          {:message "oh no", :type "java.lang.Exception"}
          #(str/starts-with? % "ERROR in  (foo.clj:42)\nException: java.lang.Exception: oh no\n at kaocha.plugin.junit_xml_test")]]
 
-       (-> {:kaocha.testable/id :my.app/my-test-case
-            :kaocha.result/error 1
-            :kaocha.testable/events [{:file "bar.clj"
-                                      :line 108
-                                      :type :fail
-                                      :expected '(= {:foo 4} {:foo 5}),
-                                      :actual '(not (= {:foo 4} {:foo 5}))
-                                      :message nil}
-                                     {:file "foo.clj"
-                                      :line 42
-                                      :type :error
-                                      :actual (Exception. "oh no")}]}
-           junit-xml/testcase->xml
-           xml->hiccup))))
+       (->> {:kaocha.testable/id :my.app/my-test-case
+             :kaocha.result/error 1
+             :kaocha.testable/events [{:file "bar.clj"
+                                       :line 108
+                                       :type :fail
+                                       :expected '(= {:foo 4} {:foo 5}),
+                                       :actual '(not (= {:foo 4} {:foo 5}))
+                                       :message nil}
+                                      {:file "foo.clj"
+                                       :line 42
+                                       :type :error
+                                       :actual (Exception. "oh no")}]}
+            (junit-xml/testcase->xml {})
+            xml->hiccup))))
 
 (deftest suite->xml-test
   (is (match? {:tag :testsuite
@@ -194,7 +272,10 @@
              "Save the test results to a Ant JUnit XML file."
 
              "--junit-xml-omit-system-out"
-             "Do not add captured output to junit.xml"]]
+             "Do not add captured output to junit.xml"
+
+             "--add-location-metadata"
+             "Add line, column, and file attributes to tests in junit.xml"]]
            (let [chain (plugin/load-all [:kaocha.plugin/junit-xml])]
              (plugin/run-hook* chain :kaocha.hooks/cli-options [])))))
 
