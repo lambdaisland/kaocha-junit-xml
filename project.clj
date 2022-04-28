@@ -1,4 +1,4 @@
-(defproject droit.tech/kaocha-junit-xml "0.0.78"
+(defproject tech.droit/kaocha-junit-xml "0.0.78"
   :description "Kaocha plugin to generate a JUnit XML version of the test results."
   :url "https://github.com/droitfintech/kaocha-junit-xml"
   :dependencies
