@@ -84,7 +84,9 @@ bin/kaocha --plugin kaocha.plugin/junit-xml --junit-xml-file junit.xml --junit-x
 
 Requires at least Kaocha 0.0-306 and Clojure 1.9.
 
-## Examples
+## CI Integration
+
+Some CI tooling supports the `junit` `xml` output in various flavours.
 
 ### CircleCI
 
@@ -107,8 +109,18 @@ jobs:
 
 ### GitHub Actions
 
-The following `.github/workflows/build.yml` configuration will create annotations 
-for test failures on files of the relevant commit/PR:
+The following configuration will create annotations for test failures on files of 
+the relevant commit/PR. First enable the plugin with the `add-location-metadata?` 
+flag in your `tests.edn`:
+
+```edn
+#kaocha/v1
+{:plugins [:kaocha.plugin/junit-xml]
+ :kaocha.plugin.junit-xml/target-file "junit.xml"
+ :kaocha.plugin.junit-xml/add-location-metadata? true}
+```
+
+Then, an example `.github/workflows/build.yml` may look like: 
 
 ```yml
 name: Build
@@ -123,10 +135,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: test
         run: |
-          bin/kaocha \
-            --plugin kaocha.plugin/junit-xml \
-            --junit-xml-file junit.xml \
-            --add-location-metadata
+          bin/kaocha
       - name: Annotate failure
         if: failure()
         uses: mikepenz/action-junit-report@41a3188dde10229782fd78cd72fc574884dd7686
@@ -134,6 +143,24 @@ jobs:
           report_paths: junit.xml
 ```
 
+### Gitlab
+
+Configuring Gitlab to parse JUnit XML is easy; just add a `report` artifact that
+points to the XML file:
+
+```yaml
+test:
+  only:
+    -tags
+  script:
+    - make test
+  artifacts:
+    reports:
+      junit: junit.xml
+```
+
+See the [Gitlab documentation on reports using
+JUnit](https://docs.gitlab.com/ce/ci/junit_test_reports.html) for more information.
 
 ## Caveats
 
@@ -155,24 +182,12 @@ For information on how to configure CircleCI to use this information, see
 After reports that the output was not compatible with Azure Devops Pipeline the
 output was changed to adhere to [this schema](https://github.com/windyroad/JUnit-Schema/blob/49e95a79cc0bfba7961aaf779710a43a4d3f96bd/JUnit.xsd).
 
-### Gitlab
-
-Configuring Gitlab to parse JUnit XML is easy; just add a `report` artifact that
-points to the XML file:
-
-```yaml
-test:
-  only:
-    -tags
-  script:
-    - make test
-  artifacts:
-    reports:
-      junit: junit.xml
-```
-
-See the [Gitlab documentation on reports using
-JUnit](https://docs.gitlab.com/ce/ci/junit_test_reports.html) for more information.
+The `--add-location-metadata` flag was added to enhance `testcase` output with
+test location metadata à la 
+[pytest](https://docs.pytest.org/en/latest/how-to/output.html?highlight=junit#creating-junitxml-format-files). 
+This allows for integration with various tools on GitHub Actions for producing
+annotations on files in commits/PRs with test failure data. For example, the 
+[JUnit Report Action](https://github.com/marketplace/actions/junit-report-action).
 
 <!-- contributing -->
 ## Contributing

@@ -90,6 +90,11 @@
   [test-file]
   (let [abs-path #(.getAbsolutePath %)]
     (-> test-file
+        ;; TODO:
+        ;; This works, but it is preferable to fix this upstream in `kaocha` so
+        ;; we don't have to supply the classloader explicitly.
+        ;; See the discussion on the following PR:
+        ;; https://github.com/lambdaisland/kaocha-junit-xml/pull/13
         (io/resource (deref Compiler/LOADER))
         io/file
         abs-path)))
