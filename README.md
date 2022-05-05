@@ -84,7 +84,9 @@ bin/kaocha --plugin kaocha.plugin/junit-xml --junit-xml-file junit.xml --junit-x
 
 Requires at least Kaocha 0.0-306 and Clojure 1.9.
 
-## CircleCI
+## Examples
+
+### CircleCI
 
 One of the services that can use this output is CircleCI. Your
 `.circleci/config.yml` could look like this:
@@ -102,6 +104,36 @@ jobs:
       - store_test_results:
           path: test-results
 ```
+
+### GitHub Actions
+
+The following `.github/workflows/build.yml` configuration will create annotations 
+for test failures on files of the relevant commit/PR:
+
+```yml
+name: Build
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: clojure:openjdk-8-tools-deps-1.11.1.1113
+    steps:
+      - uses: actions/checkout@v2
+      - name: test
+        run: |
+          bin/kaocha \
+            --plugin kaocha.plugin/junit-xml \
+            --junit-xml-file junit.xml \
+            --add-location-metadata
+      - name: Annotate failure
+        if: failure()
+        uses: mikepenz/action-junit-report@41a3188dde10229782fd78cd72fc574884dd7686
+        with:
+          report_paths: junit.xml
+```
+
 
 ## Caveats
 

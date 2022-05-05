@@ -2,6 +2,9 @@
 
 ## Added
 
+- Added a flag to include file location metadata as attributes on testcases, à la
+  pytest.
+
 ## Fixed
 
 ## Changed

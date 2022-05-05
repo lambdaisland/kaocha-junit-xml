@@ -8,9 +8,8 @@
             [kaocha.plugin :as plugin]
             [kaocha.plugin.junit-xml.xml :as xml]
             [clojure.java.io :as io]
-            [clojure.xml]
-            [kaocha.report :as report])
-  (:import [java.nio.file Files Paths]
+            [clojure.xml])
+  (:import [java.nio.file Files]
            [java.nio.file.attribute FileAttribute]
            [javax.xml.parsers SAXParser SAXParserFactory]))
 
