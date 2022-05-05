@@ -273,7 +273,7 @@
              "--junit-xml-omit-system-out"
              "Do not add captured output to junit.xml"
 
-             "--add-location-metadata"
+             "--junit-xml-add-location-metadata"
              "Add line, column, and file attributes to tests in junit.xml"]]
            (let [chain (plugin/load-all [:kaocha.plugin/junit-xml])]
              (plugin/run-hook* chain :kaocha.hooks/cli-options [])))))

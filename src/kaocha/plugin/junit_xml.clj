@@ -175,13 +175,13 @@
                 "--junit-xml-omit-system-out"
                 "Do not add captured output to junit.xml"
 
-                "--add-location-metadata"
+                "--junit-xml-add-location-metadata"
                 "Add line, column, and file attributes to tests in junit.xml"]))
 
   (config [config]
     (let [target-file      (get-in config [:kaocha/cli-options :junit-xml-file])
           omit-system-out? (get-in config [:kaocha/cli-options :junit-xml-omit-system-out])
-          add-location-metadata? (get-in config [:kaocha/cli-options :add-location-metadata])]
+          add-location-metadata? (get-in config [:kaocha/cli-options :junit-xml-add-location-metadata])]
       (cond-> config
 
               target-file
