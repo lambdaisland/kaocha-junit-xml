@@ -132,16 +132,16 @@
                                     (namespace id)
                                     "")))
      :content (concat
-                [{:tag :properties}]
-                (map (partial testcase->xml result) (leaf-tests suite))
-                [(merge {:tag :system-out}
-                        (when-not omit-system-out?
-                          {:content (->> suite
-                                         test-seq
-                                         (keep :kaocha.plugin.capture-output/output)
-                                         (remove #{""})
-                                         (map strip-ansi-sequences))}))
-                 {:tag :system-err}])}))
+               [{:tag :properties}]
+               (map (partial testcase->xml result) (leaf-tests suite))
+               [(cond-> {:tag :system-out}
+                  (not omit-system-out?)
+                  (assoc :content (->> suite
+                                       test-seq
+                                       (keep :kaocha.plugin.capture-output/output)
+                                       (remove #{""})
+                                       (map strip-ansi-sequences))))
+                {:tag :system-err}])}))
 
 (defn result->xml [result]
   (let [suites (::result/tests result)]
@@ -167,15 +167,16 @@
   "Write test results to junit.xml"
 
   (cli-options [opts]
-    (conj opts [nil
-                "--junit-xml-file FILENAME"
-                "Save the test results to a Ant JUnit XML file."
-
-                "--junit-xml-omit-system-out"
-                "Do not add captured output to junit.xml"
-
-                "--junit-xml-add-location-metadata"
-                "Add line, column, and file attributes to tests in junit.xml"]))
+    (conj opts
+          [nil
+           "--junit-xml-file FILENAME"
+           "Save the test results to a Ant JUnit XML file."]
+          [nil
+           "--junit-xml-omit-system-out"
+           "Do not add captured output to junit.xml"]
+          [nil
+           "--junit-xml-add-location-metadata"
+           "Add line, column, and file attributes to tests in junit.xml"]))
 
   (config [config]
     (let [target-file      (get-in config [:kaocha/cli-options :junit-xml-file])
@@ -183,14 +184,14 @@
           add-location-metadata? (get-in config [:kaocha/cli-options :junit-xml-add-location-metadata])]
       (cond-> config
 
-              target-file
-              (assoc ::target-file target-file)
+        target-file
+        (assoc ::target-file target-file)
 
-              omit-system-out?
-              (assoc ::omit-system-out? true)
+        omit-system-out?
+        (assoc ::omit-system-out? true)
 
-              add-location-metadata?
-              (assoc ::add-location-metadata true))))
+        add-location-metadata?
+        (assoc ::add-location-metadata true))))
 
   (post-run [result]
     (when-let [filename (::target-file result)]
