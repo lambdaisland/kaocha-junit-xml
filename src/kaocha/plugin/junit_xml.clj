@@ -191,7 +191,7 @@
         (assoc ::omit-system-out? true)
 
         add-location-metadata?
-        (assoc ::add-location-metadata true))))
+        (assoc ::add-location-metadata? true))))
 
   (post-run [result]
     (when-let [filename (::target-file result)]

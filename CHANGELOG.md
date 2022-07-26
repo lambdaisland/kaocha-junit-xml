@@ -1,10 +1,8 @@
 # Unreleased
 
-## Added
-
 ## Fixed
 
-## Changed
+- Fix `--junit-xml-add-location-metadata` command line flag
 
 # 1.15.95 (2022-07-26 / de6d134)
 
