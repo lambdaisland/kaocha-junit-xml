@@ -4,3 +4,5 @@ target
 repl
 scratch.clj
 .store
+.clj-kondo/.cache
+.lsp

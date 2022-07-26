@@ -86,21 +86,42 @@
                         ":error")}
      :content [(failure-message m)]}))
 
-(defn testcase->xml [test]
+(defn absolute-path
+  [test-file]
+  (some-> test-file
+          ;; TODO:
+          ;; This works, but it is preferable to fix this upstream in `kaocha` so
+          ;; we don't have to supply the classloader explicitly.
+          ;; See the discussion on the following PR:
+          ;; https://github.com/lambdaisland/kaocha-junit-xml/pull/13
+          (io/resource (deref Compiler/LOADER))
+          io/file
+          .getAbsolutePath))
+
+(defn test-location-metadata
+  [m]
+  (-> m
+      (get ::testable/meta)
+      (select-keys [:line :column :file])
+      (update :file absolute-path)))
+
+(defn testcase->xml [result test]
   (let [{::testable/keys [id skip events]
          ::result/keys   [pass fail error]
          :or             {pass 0 fail 0 error 0}} test]
     {:tag     :testcase
      :attrs   (merge {:name       (test-name test)
                       :classname  (namespace id)}
-                     (time-stat test))
+                     (time-stat test)
+                     (when (some-> result ::add-location-metadata?)
+                       (test-location-metadata test)))
      :content (keep (fn [m]
                       (cond
                         (hierarchy/error-type? m) (error->xml m)
                         (hierarchy/fail-type? m) (failure->xml m)))
                     events)}))
 
-(defn suite->xml [{::keys [omit-system-out?]} suite index]
+(defn suite->xml [{::keys [omit-system-out?] :as result} suite index]
   (let [id (::testable/id suite)]
     {:tag     :testsuite
      :attrs   (-> {:name     (test-name suite)
@@ -111,16 +132,16 @@
                                     (namespace id)
                                     "")))
      :content (concat
-                [{:tag :properties}]
-                (map testcase->xml (leaf-tests suite))
-                [(merge {:tag :system-out}
-                        (when-not omit-system-out?
-                          {:content (->> suite
-                                         test-seq
-                                         (keep :kaocha.plugin.capture-output/output)
-                                         (remove #{""})
-                                         (map strip-ansi-sequences))}))
-                 {:tag :system-err}])}))
+               [{:tag :properties}]
+               (map (partial testcase->xml result) (leaf-tests suite))
+               [(cond-> {:tag :system-out}
+                  (not omit-system-out?)
+                  (assoc :content (->> suite
+                                       test-seq
+                                       (keep :kaocha.plugin.capture-output/output)
+                                       (remove #{""})
+                                       (map strip-ansi-sequences))))
+                {:tag :system-err}])}))
 
 (defn result->xml [result]
   (let [suites (::result/tests result)]
@@ -146,23 +167,31 @@
   "Write test results to junit.xml"
 
   (cli-options [opts]
-    (conj opts [nil
-                "--junit-xml-file FILENAME"
-                "Save the test results to a Ant JUnit XML file."
-
-                "--junit-xml-omit-system-out"
-                "Do not add captured output to junit.xml"]))
+    (conj opts
+          [nil
+           "--junit-xml-file FILENAME"
+           "Save the test results to a Ant JUnit XML file."]
+          [nil
+           "--junit-xml-omit-system-out"
+           "Do not add captured output to junit.xml"]
+          [nil
+           "--junit-xml-add-location-metadata"
+           "Add line, column, and file attributes to tests in junit.xml"]))
 
   (config [config]
     (let [target-file      (get-in config [:kaocha/cli-options :junit-xml-file])
-          omit-system-out? (get-in config [:kaocha/cli-options :junit-xml-omit-system-out])]
+          omit-system-out? (get-in config [:kaocha/cli-options :junit-xml-omit-system-out])
+          add-location-metadata? (get-in config [:kaocha/cli-options :junit-xml-add-location-metadata])]
       (cond-> config
 
-              target-file
-              (assoc ::target-file target-file)
+        target-file
+        (assoc ::target-file target-file)
 
-              omit-system-out?
-              (assoc ::omit-system-out? true))))
+        omit-system-out?
+        (assoc ::omit-system-out? true)
+
+        add-location-metadata?
+        (assoc ::add-location-metadata true))))
 
   (post-run [result]
     (when-let [filename (::target-file result)]
