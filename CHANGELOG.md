@@ -5,10 +5,6 @@
 - Added a flag to include file location metadata as attributes on testcases, à la
   pytest.
 
-## Fixed
-
-## Changed
-
 # 0.0.76 (2020-07-21 / 397a3c1)
 
 ## Added
