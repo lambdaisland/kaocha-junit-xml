@@ -1,17 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemalocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>lambdaisland</groupId>
   <artifactId>kaocha-junit-xml</artifactId>
+  <version>1.15.95</version>
   <name>kaocha-junit-xml</name>
-  <version>0.0.76</version>
-  <description>Junit xml output for kaocha</description>
+  <description>Code coverage plugin for Kaocha based on Cloverage</description>
   <url>https://github.com/lambdaisland/kaocha-junit-xml</url>
   <inceptionYear>2018</inceptionYear>
   <organization>
     <name>Lambda Island</name>
     <url>https://lambdaisland.com</url>
   </organization>
+  <properties>
+    <project class="build sourceEncoding">UTF-8</project>
+  </properties>
   <licenses>
     <license>
       <name>Eclipse Public License 1.0</name>
@@ -22,20 +25,9 @@
     <url>https://github.com/lambdaisland/kaocha-junit-xml</url>
     <connection>scm:git:git://github.com/lambdaisland/kaocha-junit-xml.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/lambdaisland/kaocha-junit-xml.git</developerConnection>
-    <tag>c3bd394464894583e106a636c16bb19308993072</tag>
+    <tag>fd2e69e1bb7ce5fe50cd9cfa9d3ec4e7d564d9e5</tag>
   </scm>
-  <dependencies>
-    <dependency>
-      <groupId>org.clojure</groupId>
-      <artifactId>clojure</artifactId>
-      <version>1.10.0</version>
-    </dependency>
-    <dependency>
-      <groupId>lambdaisland</groupId>
-      <artifactId>kaocha</artifactId>
-      <version>0.0-389</version>
-    </dependency>
-  </dependencies>
+  <dependencies></dependencies>
   <build>
     <sourceDirectory>src</sourceDirectory>
     <resources>
@@ -49,15 +41,38 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.8.1</version>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>2.4</version>
+        <version>3.2.0</version>
         <configuration>
           <archive>
             <manifestEntries>
-              <Git-Revision>c3bd394464894583e106a636c16bb19308993072</Git-Revision>
+              <git-revision>fd2e69e1bb7ce5fe50cd9cfa9d3ec4e7d564d9e5</git-revision>
             </manifestEntries>
           </archive>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-gpg-plugin</artifactId>
+        <version>1.6</version>
+        <executions>
+          <execution>
+            <id>sign-artifacts</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>sign</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
