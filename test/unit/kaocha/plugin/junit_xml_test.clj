@@ -265,19 +265,6 @@
               (junit-xml/suite->xml {:no-system-out? true} {:kaocha.testable/id :foo} 0))))
 
 (deftest junit-xml-plugin
-  (testing "cli-options"
-    (is (= [[nil
-             "--junit-xml-file FILENAME"
-             "Save the test results to a Ant JUnit XML file."
-
-             "--junit-xml-omit-system-out"
-             "Do not add captured output to junit.xml"
-
-             "--junit-xml-add-location-metadata"
-             "Add line, column, and file attributes to tests in junit.xml"]]
-           (let [chain (plugin/load-all [:kaocha.plugin/junit-xml])]
-             (plugin/run-hook* chain :kaocha.hooks/cli-options [])))))
-
   (testing "config"
     (is (= {:kaocha/cli-options {:junit-xml-file "my-out-file.xml"}
             :kaocha.plugin.junit-xml/target-file "my-out-file.xml"}
