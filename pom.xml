@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>lambdaisland</groupId>
   <artifactId>kaocha-junit-xml</artifactId>
-  <version>1.15.95</version>
+  <version>1.16.98</version>
   <name>kaocha-junit-xml</name>
   <description>Code coverage plugin for Kaocha based on Cloverage</description>
   <url>https://github.com/lambdaisland/kaocha-junit-xml</url>
@@ -25,7 +25,7 @@
     <url>https://github.com/lambdaisland/kaocha-junit-xml</url>
     <connection>scm:git:git://github.com/lambdaisland/kaocha-junit-xml.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/lambdaisland/kaocha-junit-xml.git</developerConnection>
-    <tag>fd2e69e1bb7ce5fe50cd9cfa9d3ec4e7d564d9e5</tag>
+    <tag>c62ddfe0ebd66df3a60b274c2bfb48275b403c79</tag>
   </scm>
   <dependencies></dependencies>
   <build>
@@ -55,7 +55,7 @@
         <configuration>
           <archive>
             <manifestEntries>
-              <git-revision>fd2e69e1bb7ce5fe50cd9cfa9d3ec4e7d564d9e5</git-revision>
+              <git-revision>c62ddfe0ebd66df3a60b274c2bfb48275b403c79</git-revision>
             </manifestEntries>
           </archive>
         </configuration>
