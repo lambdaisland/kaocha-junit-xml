@@ -5,6 +5,7 @@
 (lioss/main
  {:license        :epl
   :inception-year 2018
+  :group-id       "lambdaisland"
   :description    "Code coverage plugin for Kaocha based on Cloverage"})
 
 ;; Local Variables:
