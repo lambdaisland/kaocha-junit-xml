@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>lambdaisland</groupId>
   <artifactId>kaocha-junit-xml</artifactId>
-  <version>1.16.98</version>
+  <version>1.17.101</version>
   <name>kaocha-junit-xml</name>
   <description>Code coverage plugin for Kaocha based on Cloverage</description>
   <url>https://github.com/lambdaisland/kaocha-junit-xml</url>
@@ -25,9 +25,34 @@
     <url>https://github.com/lambdaisland/kaocha-junit-xml</url>
     <connection>scm:git:git://github.com/lambdaisland/kaocha-junit-xml.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/lambdaisland/kaocha-junit-xml.git</developerConnection>
-    <tag>c62ddfe0ebd66df3a60b274c2bfb48275b403c79</tag>
+    <tag>485bee4c388e536adfcb343fc8d4066e8625f937</tag>
   </scm>
-  <dependencies></dependencies>
+  <dependencies>
+    <dependency>
+      <groupId>lambdaisland</groupId>
+      <artifactId>kaocha</artifactId>
+      <version>1.69.1069</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>nubank</groupId>
+      <artifactId>matcher-combinators</artifactId>
+      <version>3.5.0</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.clojure</groupId>
+      <artifactId>data.xml</artifactId>
+      <version>0.0.8</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>lambdaisland</groupId>
+      <artifactId>kaocha-cloverage</artifactId>
+      <version>1.0.75</version>
+      <optional>true</optional>
+    </dependency>
+  </dependencies>
   <build>
     <sourceDirectory>src</sourceDirectory>
     <resources>
@@ -55,7 +80,7 @@
         <configuration>
           <archive>
             <manifestEntries>
-              <git-revision>c62ddfe0ebd66df3a60b274c2bfb48275b403c79</git-revision>
+              <git-revision>485bee4c388e536adfcb343fc8d4066e8625f937</git-revision>
             </manifestEntries>
           </archive>
         </configuration>
