@@ -1,10 +1,8 @@
 # Unreleased
 
-## Added
-
 ## Fixed
 
-## Changed
+* Fix Cljdoc build.
 
 # 1.16.98 (2022-07-26 / d50528d)
 
