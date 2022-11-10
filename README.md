@@ -37,7 +37,7 @@ so that we may continue to enjoy a thriving Clojure ecosystem.
 {:aliases
  {:test
   {:extra-deps {lambdaisland/kaocha {...}
-                lambdaisland/kaocha-junit-xml {:mvn/version "1.16.98"}}}}}
+                lambdaisland/kaocha-junit-xml {:mvn/version "1.17.101"}}}}}
 ```
 
 or
@@ -46,7 +46,7 @@ or
 ;; project.clj
 (defproject ,,,
   :dependencies [,,,
-                 [lambdaisland/kaocha-junit-xml "1.16.98"]])
+                 [lambdaisland/kaocha-junit-xml "1.17.101"]])
 ```
 
 - Enable the plugin and set an output file
