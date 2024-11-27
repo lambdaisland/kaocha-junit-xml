@@ -102,7 +102,7 @@ jobs:
     steps:
       - checkout
       - run: mkdir -p test-results/kaocha
-      - run: bin/kaocha --plugin kaocha.plugin/junit-xml --junit-xml-file test-results/kaocha/results.xml
+      - run: bin/kaocha --plugin kaocha.plugin/junit-xml --junit-xml-file test-results/kaocha/results.xml --junit-xml-add-location-metadata
       - store_test_results:
           path: test-results
 ```
