@@ -11,6 +11,7 @@
             [clojure.string :as str])
   (:import java.time.Instant
            java.nio.file.Files
+           java.nio.file.Paths
            java.nio.file.attribute.FileAttribute))
 
 (defn inst->iso8601 [inst]
@@ -98,12 +99,26 @@
           io/file
           .getAbsolutePath))
 
+(defn relative-path
+  [test-file]
+  (when-let [absolute-path (absolute-path test-file)]
+    (let [empty-string-array (make-array String 0)
+          current-path       ^java.nio.file.Path (Paths/get (System/getProperty "user.dir") empty-string-array)
+          file-path          ^java.nio.file.Path (Paths/get absolute-path empty-string-array)]
+      (str (.relativize current-path file-path)))))
+
+(defn set-file-path
+  [m result]
+  (if (::use-relative-path-in-location? result)
+    (relative-path m)
+    (absolute-path m)))
+
 (defn test-location-metadata
-  [m]
+  [m result]
   (-> m
       (get ::testable/meta)
       (select-keys [:line :column :file])
-      (update :file absolute-path)))
+      (update :file set-file-path result)))
 
 (defn testcase->xml [result test]
   (let [{::testable/keys [id skip events]
@@ -114,7 +129,7 @@
                       :classname  (namespace id)}
                      (time-stat test)
                      (when (some-> result ::add-location-metadata?)
-                       (test-location-metadata test)))
+                       (test-location-metadata test result)))
      :content (keep (fn [m]
                       (cond
                         (hierarchy/error-type? m) (error->xml m)
@@ -176,12 +191,16 @@
            "Do not add captured output to junit.xml"]
           [nil
            "--junit-xml-add-location-metadata"
-           "Add line, column, and file attributes to tests in junit.xml"]))
+           "Add line, column, and file attributes to tests in junit.xml"]
+          [nil
+           "--junit-xml-use-relative-path-in-location"
+           "Updates the file attributes printed by --junit-xml-add-location-metadata to use pathing relative to where kaocha was executed from"]))
 
   (config [config]
     (let [target-file      (get-in config [:kaocha/cli-options :junit-xml-file])
           omit-system-out? (get-in config [:kaocha/cli-options :junit-xml-omit-system-out])
-          add-location-metadata? (get-in config [:kaocha/cli-options :junit-xml-add-location-metadata])]
+          add-location-metadata? (get-in config [:kaocha/cli-options :junit-xml-add-location-metadata])
+          use-relative-path-in-location? (get-in config [:kaocha/cli-options :junit-xml-use-relative-path-in-location])]
       (cond-> config
 
         target-file
@@ -191,7 +210,10 @@
         (assoc ::omit-system-out? true)
 
         add-location-metadata?
-        (assoc ::add-location-metadata? true))))
+        (assoc ::add-location-metadata? true)
+
+        use-relative-path-in-location?
+        (assoc ::use-relative-path-in-location? true))))
 
   (post-run [result]
     (when-let [filename (::target-file result)]
