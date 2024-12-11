@@ -102,7 +102,7 @@ jobs:
     steps:
       - checkout
       - run: mkdir -p test-results/kaocha
-      - run: bin/kaocha --plugin kaocha.plugin/junit-xml --junit-xml-file test-results/kaocha/results.xml
+      - run: bin/kaocha --plugin kaocha.plugin/junit-xml --junit-xml-file test-results/kaocha/results.xml --junit-xml-add-location-metadata --junit-xml-use-relative-path-in-location
       - store_test_results:
           path: test-results
 ```
@@ -188,6 +188,10 @@ output with test location metadata à la
 This allows for integration with various tools on GitHub Actions for producing
 annotations on files in commits/PRs with test failure data. For example, the 
 [JUnit Report Action](https://github.com/marketplace/actions/junit-report-action).
+
+The `--junit-xml-use-relative-path-in-location` flasg was added to enhance the `--junit-xml-add-location-metadata`
+output for test ecosystems that rely on relative file-pathing.
+Notably, CircleCI's [parallelization](https://circleci.com/docs/use-the-circleci-cli-to-split-tests/#junit-xml-reports) assumes file paths in JUnit files are relative to the runner's working directory.
 
 <!-- contributing -->
 ## Contributing

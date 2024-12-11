@@ -160,6 +160,80 @@
              api/run
              junit-xml/result->xml
              xml->hiccup))))
+    (testing "it outputs location metadata when configured"
+      (is (match?
+           [:testsuites
+            [:testsuite {:id 0
+                         :tests 4
+                         :failures 1
+                         :errors 2
+                         :package ""
+                         :name "unit"
+                         :hostname "localhost"
+                         :timestamp string?
+                         :time "0.000000"}
+             [:properties]
+             [:testcase {:name "demo.test/basic-test" :classname "demo.test" :time "0.000000"}]
+             [:testcase {:name "demo.test/exception-in-is-test"
+                         :classname "demo.test"
+                         :time "0.000000"
+                         :column 1
+                         :file "fixtures/kaocha-demo/demo/test.clj"
+                         :line 15}
+              [:error {:message "Inside assertion" :type "java.lang.Exception"}
+               #(str/starts-with? % (str "ERROR in demo.test/exception-in-is-test (test.clj:15)\n"
+                                         "it outputs location metadata when configured\n"
+                                         "Exception: java.lang.Exception: Inside assertion\n"
+                                         " at demo.test"))]]
+             [:testcase {:name "demo.test/exception-outside-is-test"
+                         :classname "demo.test"
+                         :time "0.000000"
+                         :column 1
+                         :file "fixtures/kaocha-demo/demo/test.clj"
+                         :line 19}
+              [:error {:message "Uncaught exception, not in assertion."
+                       :type "java.lang.Exception"}
+               #(str/starts-with? % (str "ERROR in demo.test/exception-outside-is-test (test.clj:19)\n"
+                                         "it outputs location metadata when configured\n"
+                                         "Uncaught exception, not in assertion.\n"
+                                         "Exception: java.lang.Exception: outside assertion\n"
+                                         " at demo.test"))]]
+             [:testcase {:name "demo.test/output-test"
+                         :classname "demo.test"
+                         :time "0.000000"
+                         :column 1
+                         :line 7
+                         :file "fixtures/kaocha-demo/demo/test.clj"}
+              [:failure {:message "[:fail] expected: (= {:foo 1} {:foo 2}). actual: (not (= {:foo 1} {:foo 2}))"
+                         :type "assertion failure: ="}
+               (str "FAIL in demo.test/output-test (test.clj:13)\n"
+                    "it outputs location metadata when configured\n"
+                    "oops\n"
+                    "Expected:\n"
+                    "  {:foo 1}\n"
+                    "Actual:\n"
+                    "  {:foo -1 +2}\n"
+                    "╭───── Test output ───────────────────────────────────────────────────────\n"
+                    "│ this is on stdout\n"
+                    "│ this is on stderr\n"
+                    "╰─────────────────────────────────────────────────────────────────────────")]]
+             [:testcase {:name "demo.test/skip-test"
+                         :classname "demo.test"
+                         :time "0.000000"}]
+             [:system-out "this is on stdout\nthis is on stderr\n"]
+             [:system-err]]]
+
+           (-> {:tests [{:test-paths ["fixtures/kaocha-demo"]
+                         :ns-patterns [".*"]}]
+                :kaocha.plugin.randomize/randomize? false
+                :kaocha.plugin.junit-xml/add-location-metadata? true
+                :kaocha.plugin.junit-xml/use-relative-path-in-location? true
+                :color? false
+                :reporter identity}
+               repl/config
+               api/run
+               junit-xml/result->xml
+               xml->hiccup))))
     (testing "it renders start-time when present"
       (is (= [:testsuites
               [:testsuite {:name "my-test-type" :id 0 :hostname "localhost"
