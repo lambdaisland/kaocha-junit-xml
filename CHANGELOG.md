@@ -4,6 +4,8 @@
 
 ## Fixed
 
+* Reporting test cases marked with "pending" Kaocha tag as "skipped" in JUnit XML output (Issue #20)
+
 ## Changed
 
 # 1.17.101 (2022-11-09 / 95067b2)

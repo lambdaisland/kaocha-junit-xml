@@ -45,6 +45,7 @@
         start-time (:kaocha.plugin.profiling/start testable (Instant/now))]
     {:errors   (::result/error totals)
      :failures (::result/fail totals)
+     :skipped  (::result/pending totals)
      :tests    (::result/count totals)
      :timestamp (inst->iso8601 start-time)}))
 
@@ -62,6 +63,9 @@
 
 (defn classname [obj]
   (.getName (class obj)))
+
+(defn skipped->xml [m]
+  {:tag :skipped})
 
 (defn failure->xml [m]
   (let [assertion-type (report/assertion-type m)]
@@ -132,6 +136,7 @@
                        (test-location-metadata test result)))
      :content (keep (fn [m]
                       (cond
+                        (hierarchy/pending? m) (skipped->xml m)
                         (hierarchy/error-type? m) (error->xml m)
                         (hierarchy/fail-type? m) (failure->xml m)))
                     events)}))

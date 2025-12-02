@@ -30,12 +30,13 @@
   (is (match?
        [:testsuites
         [:testsuite {:id 0
-                     :tests 4
+                     :tests 5
                      :failures 1
                      :errors 2
                      :package ""
                      :name "unit"
                      :hostname "localhost"
+                     :skipped 1
                      :timestamp string?
                      :time "0.000000"}
          [:properties]
@@ -71,6 +72,10 @@
                 "│ this is on stdout\n"
                 "│ this is on stderr\n"
                 "╰─────────────────────────────────────────────────────────────────────────")]]
+         [:testcase {:name "demo.test/pending-test"
+                     :classname "demo.test"
+                     :time "0.000000"}
+          [:skipped]]
          [:testcase {:name "demo.test/skip-test"
                      :classname "demo.test"
                      :time "0.000000"}]
@@ -91,12 +96,13 @@
     (is (match?
          [:testsuites
           [:testsuite {:id 0
-                       :tests 4
+                       :tests 5
                        :failures 1
                        :errors 2
                        :package ""
                        :name "unit"
                        :hostname "localhost"
+                       :skipped 1
                        :timestamp string?
                        :time "0.000000"}
            [:properties]
@@ -144,6 +150,10 @@
                   "│ this is on stdout\n"
                   "│ this is on stderr\n"
                   "╰─────────────────────────────────────────────────────────────────────────")]]
+           [:testcase {:name "demo.test/pending-test"
+                       :classname "demo.test"
+                       :time "0.000000"}
+            [:skipped]]
            [:testcase {:name "demo.test/skip-test"
                        :classname "demo.test"
                        :time "0.000000"}]
@@ -164,12 +174,13 @@
       (is (match?
            [:testsuites
             [:testsuite {:id 0
-                         :tests 4
+                         :tests 5
                          :failures 1
                          :errors 2
                          :package ""
                          :name "unit"
                          :hostname "localhost"
+                         :skipped 1
                          :timestamp string?
                          :time "0.000000"}
              [:properties]
@@ -217,6 +228,12 @@
                     "│ this is on stdout\n"
                     "│ this is on stderr\n"
                     "╰─────────────────────────────────────────────────────────────────────────")]]
+             [:testcase {:name "demo.test/pending-test"
+                         :classname "demo.test"
+                         :time "0.000000"
+                         :line 26
+                         :column 1}
+              [:skipped]]
              [:testcase {:name "demo.test/skip-test"
                          :classname "demo.test"
                          :time "0.000000"}]
@@ -239,7 +256,8 @@
               [:testsuite {:name "my-test-type" :id 0 :hostname "localhost"
                            :package ""
                            :errors 0 :failures 1 :tests 1
-                           :timestamp "2007-12-03T10:15:30" :time "0.000012"}
+                           :timestamp "2007-12-03T10:15:30" :time "0.000012"
+                           :skipped 0}
                [:properties]
                [:testcase {:classname nil
                            :name "my-test-type"
@@ -372,7 +390,8 @@
                            :hostname "localhost"
                            :id "0"
                            :timestamp "2007-12-03T10:15:30"
-                           :failures "0"}
+                           :failures "0"
+                           :skipped "0"}
                [:properties]
                [:system-out]
                [:system-err]]]
